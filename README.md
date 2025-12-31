@@ -1,65 +1,84 @@
-## 🌟TA2CAY RADAR PROJESİ: 
+# TA2CAY Radar Projesi
 
-Bu proje, Arduino/ESP32 tabanlı, OLED ekranlı ve servo motorlu bir radar sistemidir. Çevresindeki nesneleri ultrasonik sensör ile tarar ve mesafelerini görsel olarak ekrana yansıtır.
+ESP32, HC-SR04 Ultrasonik Sensör, Servo Motor ve SH1106 OLED ekran kullanan gelişmiş radar sistemi.
 
-![Radar Projesi Görseli](radar.jpg)
+![Radar Görseli](radar.jpg)
 
-## � Proje Hakkında
+## Özellikler
 
-Bu proje, klasik ultrasonik radar projelerini bir adım öteye taşıyor. Sadece mesafe ölçmekle kalmaz, topladığı verileri  kullanıcıya sunar.
+- **Görsel Efektler**
+  - Tarama izi (fade trail) efekti
+  - Engel geçmişi takibi (10 saniye hafıza)
+  - Animasyonlu tehlike sembolleri (!, !!, !!!)
+  
+- **Anlık Veriler**
+  - Mesafe ölçümü (0-50 cm)
+  - Tarama açısı (0-180°)
+  - Ortam sıcaklığı (DHT11)
+  - Tespit sayacı ve tarama istatistikleri
 
-**Öne Çıkan Farklar:**
-*   **Akıllı Görselleştirme:** Tarama yapan ışının arkasında bıraktığı "Fade Trail" (iz) efekti.
-*   **Hafıza Sistemi:** Tespit edilen engeller ekrandan hemen silinmez, 10 saniye boyunca "hayalet iz" olarak kalır.
-*   **Dinamik Uyarılar:** Cisim yaklaştıkça beliren ve yanıp sönen animasyonlu tehlike sembolleri (`!`, `!!`, `!!!`).
-*   **Detaylı Analiz:** Mesafe, Açı, Ortam Sıcaklığı ve Tespit Sayacı gibi verileri anlık gösterir.
+## Donanım Gereksinimleri
 
-## 🛠️ Teknik Özellikler ve Donanım
+| Bileşen | Model | Adet |
+|---------|-------|------|
+| Geliştirme Kartı | ESP32 DevKit | 1 |
+| Ekran | SH1106 OLED 1.3" (I2C) | 1 |
+| Mesafe Sensörü | HC-SR04 | 1 |
+| Servo Motor | SG90 (veya eşdeğeri) | 1 |
+| Sıcaklık Sensörü | DHT11 | 1 |
+| LED | Standart 5mm | 1 |
+| Buzzer | Pasif Buzzer | 1 |
 
-| Bileşen | Model | Görevi |
-|---------|-------|--------|
-| **İşlemci** | ESP32 DevKit V1 | Sistemin beyni, yüksek performanslı kontrol. |
-| **Göz** | HC-SR04 | Ultrasonik ses dalgaları ile hassas mesafe ölçümü. |
-| **Hareket** | SG90 Servo | 0-180 derece hassas tarama hareketi. |
-| **Ekran** | SH1106 OLED (1.3") | Yüksek kontrastlı grafik arayüz (I2C). |
-| **Sensör** | DHT11 | Ortam sıcaklık ve nem takibi. |
-
-## 📂 Kod Mimarisi
-
-Proje, yönetilebilir ve temiz bir kod yapısı için modüler hale getirilmiştir:
-
-### 1. 🧠 `radar.ino` (Ana Kontrolcü)
-Sistemin çekirdeğidir. Donanım başlatma, sensör okuma döngüleri ve ana ekran çizimlerini yönetir.
-
-### 2. 🎨 `radar_helpers.ino` (Görsel Motor)
-Projenin "makyaj" kısmıdır.
-*   **`drawFadeEffect()`:** Radar tarama izini çizer.
-*   **`addObstacle()`:** Tespit edilen engelleri hafızaya alır ve yönetir.
-*   **`getDangerSymbol()`:** Tehlike seviyesini analiz eder.
-
-## 🚀 Kurulum ve Kullanım
-
-1.  Bu repoyu indirin veya klonlayın.
-2.  `radar.ino` dosyasını Arduino IDE ile açın (Helper dosyası otomatik açılacaktır).
-3.  Gerekli kütüphaneleri (`U8g2`, `ESP32Servo`, `DHT`) kütüphane yöneticisinden yükleyin.
-4.  Bağlantı şemasını kontrol edip kodu ESP32'ye yükleyin.
-5.  **Keyfini çıkarın!** Radarınız açılış animasyonu ile başlayacaktır.
-
-
-## 📝 Pin Bağlantıları
+## Pin Bağlantıları
 
 ```
-ESP32  <-->  Bileşen
---------------------
-D12    <-->  Servo Motor (Sarı/Turuncu Kablo)
-D27    <-->  HC-SR04 (Trig)
-D26    <-->  HC-SR04 (Echo)
-D13    <-->  LED (Opsiyonel)
-D14    <-->  Buzzer (Opsiyonel)
-D25    <-->  DHT11 (Data)
+ESP32 Pin  →  Bileşen
+─────────────────────
+GPIO 12    →  Servo Motor (Sinyal)
+GPIO 27    →  HC-SR04 (Trig)
+GPIO 26    →  HC-SR04 (Echo)
+GPIO 25    →  DHT11 (Data)
+GPIO 14    →  Buzzer
+GPIO 13    →  LED
+SDA/SCL    →  OLED Ekran (I2C)
 ```
 
----
-**Geliştirici:** TA2CAY
-*Bu proje Eğitim ve Hobi amaçlı geliştirilmiştir.*
+## Kurulum
 
+### 1. Kütüphaneleri Yükleyin
+
+Arduino IDE → Sketch → Include Library → Manage Libraries
+
+- `U8g2` (OLED ekran)
+- `ESP32Servo` (Servo motor kontrolü)
+- `DHT sensor library` (Sıcaklık sensörü)
+
+### 2. Kodu Yükleyin
+
+1. `radar.ino` ve `radar_helpers.ino` dosyalarını indirin
+2. Arduino IDE ile `radar.ino` dosyasını açın
+3. ESP32 kartınızı seçin (Tools → Board → ESP32 Dev Module)
+4. Doğru portu seçin
+5. Upload butonuna basın
+
+## Kod Yapısı
+
+### `radar.ino` (Ana Dosya)
+- Donanım başlatma ve pin tanımlamaları
+- Ana döngü (setup ve loop)
+- Sensör okuma ve servo kontrolü
+- Ekran çizim fonksiyonları
+
+### `radar_helpers.ino` (Yardımcı Fonksiyonlar)
+- `addObstacle()` - Engel hafıza yönetimi
+- `drawFadeEffect()` - Tarama izi çizimi
+- `drawObstacleHistory()` - Geçmiş engelleri görselleştirme
+- `getDangerSymbol()` - Tehlike seviyesi belirleme
+
+## Lisans
+
+MIT License - Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+## Geliştirici
+
+**TA2CAY** - Eğitim ve hobi amaçlı geliştirilmiştir.
