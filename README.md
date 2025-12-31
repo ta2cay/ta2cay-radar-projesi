@@ -4,70 +4,62 @@ Bu proje, Arduino/ESP32 tabanlı, OLED ekranlı ve servo motorlu bir radar siste
 
 ![Radar Projesi Görseli](radar.jpg)
 
-## 🌟 Özellikler
+## � Proje Hakkında
 
-*   **Gelişmiş Görsel Arayüz:** 
-    *   Tarama izi efekti (fade trail)
-    *   Animasyonlu tehlike sembolleri (!, !!, !!!)
-    *   Engel geçmişi takibi
-*   **Bilgi Paneli:**
-    *   Anlık Açı ve Mesafe
-    *   Ortam Sıcaklığı (DHT11 ile)
-    *   Tespit Edilen Nesne Sayısı
-    *   Toplam Tarama Sayısı
-*   **Güç Tasarrufu:**
-    *   Optimize edilmiş servo hareketleri
-    *   Güç dalgalanmalarını önleyen kademeli başlangıç
+Bu proje, klasik ultrasonik radar projelerini bir adım öteye taşıyor. Sadece mesafe ölçmekle kalmaz, topladığı verileri  kullanıcıya sunar.
 
-## 🛠️ Donanım Listesi
+**Öne Çıkan Farklar:**
+*   **Akıllı Görselleştirme:** Tarama yapan ışının arkasında bıraktığı "Fade Trail" (iz) efekti.
+*   **Hafıza Sistemi:** Tespit edilen engeller ekrandan hemen silinmez, 10 saniye boyunca "hayalet iz" olarak kalır.
+*   **Dinamik Uyarılar:** Cisim yaklaştıkça beliren ve yanıp sönen animasyonlu tehlike sembolleri (`!`, `!!`, `!!!`).
+*   **Detaylı Analiz:** Mesafe, Açı, Ortam Sıcaklığı ve Tespit Sayacı gibi verileri anlık gösterir.
 
-*   ESP32 Geliştirme Kartı
-*   HC-SR04 Ultrasonik Mesafe Sensörü
-*   SG90 Servo Motor
-*   SH1106 OLED Ekran (1.3 inç)
-*   DHT11 Sıcaklık ve Nem Sensörü
-*   LED ve Buzzer
-*   Breadboard ve Jumper Kablolar
+## 🛠️ Teknik Özellikler ve Donanım
 
-## 📚 Kütüphaneler
+| Bileşen | Model | Görevi |
+|---------|-------|--------|
+| **İşlemci** | ESP32 DevKit V1 | Sistemin beyni, yüksek performanslı kontrol. |
+| **Göz** | HC-SR04 | Ultrasonik ses dalgaları ile hassas mesafe ölçümü. |
+| **Hareket** | SG90 Servo | 0-180 derece hassas tarama hareketi. |
+| **Ekran** | SH1106 OLED (1.3") | Yüksek kontrastlı grafik arayüz (I2C). |
+| **Sensör** | DHT11 | Ortam sıcaklık ve nem takibi. |
 
-Bu proje aşağıdaki Arduino kütüphanelerini kullanır:
-*   `U8g2` (Ekran için)
-*   `ESP32Servo` (Motor için)
-*   `DHT sensor library` (Sıcaklık için)
+## 📂 Kod Mimarisi
 
-## � Kod Yapısı
+Proje, yönetilebilir ve temiz bir kod yapısı için modüler hale getirilmiştir:
 
-Proje kodların daha düzenli olması için iki dosyaya bölünmüştür:
+### 1. 🧠 `radar.ino` (Ana Kontrolcü)
+Sistemin çekirdeğidir. Donanım başlatma, sensör okuma döngüleri ve ana ekran çizimlerini yönetir.
 
-1.  **`radar.ino` (Ana Dosya):**
-    *   Setup ve Loop döngüleri
-    *   Sensör okuma ve servo kontrolü
-    *   Ekran çizim ana fonksiyonları
-    *   Pin tanımlamaları
+### 2. 🎨 `radar_helpers.ino` (Görsel Motor)
+Projenin "makyaj" kısmıdır.
+*   **`drawFadeEffect()`:** Radar tarama izini çizer.
+*   **`addObstacle()`:** Tespit edilen engelleri hafızaya alır ve yönetir.
+*   **`getDangerSymbol()`:** Tehlike seviyesini analiz eder.
 
-2.  **`radar_helpers.ino` (Yardımcı Dosya):**
-    *   **Engel Hafızası:** Eski engelleri ekranda 10 saniye tutan kodlar.
-    *   **Fade Trail:** Tarama çizgisinin arkasındaki iz efekti.
-    *   **Tehlike Sembolleri:** Mesafeye göre (!, !!, !!!) işaretlerini belirleyen mantık.
+## 🚀 Kurulum ve Kullanım
 
-## �🚀 Kurulum
+1.  Bu repoyu indirin veya klonlayın.
+2.  `radar.ino` dosyasını Arduino IDE ile açın (Helper dosyası otomatik açılacaktır).
+3.  Gerekli kütüphaneleri (`U8g2`, `ESP32Servo`, `DHT`) kütüphane yöneticisinden yükleyin.
+4.  Bağlantı şemasını kontrol edip kodu ESP32'ye yükleyin.
+5.  **Keyfini çıkarın!** Radarınız açılış animasyonu ile başlayacaktır.
 
-1.  `radar.ino` ve `radar_helpers.ino` dosyalarını aynı klasöre koyun.
-2.  Arduino IDE ile `radar.ino` dosyasını açın.
-3.  Gerekli kütüphaneleri Yöneticiden yükleyin.
-4.  ESP32 kartınıza yükleyin.
 
 ## 📝 Pin Bağlantıları
 
-| Bileşen | Pin |
-|---------|-----|
-| Servo   | 12  |
-| Trig    | 27  |
-| Echo    | 26  |
-| LED     | 13  |
-| Buzzer  | 14  |
-| DHT11   | 25  |
+```
+ESP32  <-->  Bileşen
+--------------------
+D12    <-->  Servo Motor (Sarı/Turuncu Kablo)
+D27    <-->  HC-SR04 (Trig)
+D26    <-->  HC-SR04 (Echo)
+D13    <-->  LED (Opsiyonel)
+D14    <-->  Buzzer (Opsiyonel)
+D25    <-->  DHT11 (Data)
+```
 
 ---
 **Geliştirici:** TA2CAY
+*Bu proje Eğitim ve Hobi amaçlı geliştirilmiştir.*
+
