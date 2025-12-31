@@ -1,7 +1,8 @@
+## 🌟TA2CAY RADAR PROJESİ: 
+
 Bu proje, Arduino/ESP32 tabanlı, OLED ekranlı ve servo motorlu bir radar sistemidir. Çevresindeki nesneleri ultrasonik sensör ile tarar ve mesafelerini görsel olarak ekrana yansıtır.
 
 ![Radar Projesi Görseli](radar.jpg)
-*(Ekran görüntülerinizi buraya eklemeyi unutmayın! Dosya adı radar.jpg olmalı)*
 
 ## 🌟 Özellikler
 
