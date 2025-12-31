@@ -31,17 +31,37 @@ ESP32, HC-SR04 Ultrasonik Sensör, Servo Motor ve SH1106 OLED ekran kullanan gel
 
 ## Pin Bağlantıları
 
-```
-ESP32 Pin  →  Bileşen
-─────────────────────
-GPIO 12    →  Servo Motor (Sinyal)
-GPIO 27    →  HC-SR04 (Trig)
-GPIO 26    →  HC-SR04 (Echo)
-GPIO 25    →  DHT11 (Data)
-GPIO 14    →  Buzzer
-GPIO 13    →  LED
-SDA/SCL    →  OLED Ekran (I2C)
-```
+### Servo Motor (SG90)
+- **Sinyal (Turuncu/Sarı)** → ESP32 GPIO 12
+- **+5V (Kırmızı)** → ESP32 VIN veya Harici 5V
+- **GND (Kahverengi)** → ESP32 GND
+
+### Ultrasonik Sensör (HC-SR04)
+- **VCC** → ESP32 5V (VIN)
+- **Trig** → ESP32 GPIO 27
+- **Echo** → ESP32 GPIO 26
+- **GND** → ESP32 GND
+
+### OLED Ekran (SH1106 I2C)
+- **VCC** → ESP32 3.3V
+- **GND** → ESP32 GND
+- **SDA** → ESP32 GPIO 21
+- **SCL** → ESP32 GPIO 22
+
+### Sıcaklık Sensörü (DHT11)
+- **VCC** → ESP32 3.3V
+- **Data** → ESP32 GPIO 25
+- **GND** → ESP32 GND
+
+### LED
+- **Anot (+)** → ESP32 GPIO 13 (220Ω direnç ile)
+- **Katot (-)** → ESP32 GND
+
+### Buzzer
+- **Pozitif (+)** → ESP32 GPIO 14
+- **Negatif (-)** → ESP32 GND
+
+> **Not:** Servo motor yüksek akım çekebilir. Güç sorunları yaşarsanız servoya harici 5V güç kaynağı bağlayın (GND'leri ortak yapın).
 
 ## Kurulum
 
