@@ -2,7 +2,6 @@
 
 ESP32, HC-SR04 Ultrasonik Sensör, Servo Motor ve OLED ekran kullanılarak yapılmış gelişmiş bir radar sistemi.
 
-![Radar v2.0](https://raw.githubusercontent.com/ta2cay/ta2cay-radar-projesi/main/oled_preview.png)
 
 ## ✨ v2.0 Yenilikleri (Büyük Güncelleme!)
 
