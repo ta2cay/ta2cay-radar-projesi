@@ -93,30 +93,107 @@ void setup() {
   display.begin();
   Serial.println("U8g2 OLED başlatıldı!");
 
-  // Başlangıç mesajı - Görsel olarak iyileştirilmiş
-  display.clearBuffer();
+  // ========== AÇILIŞ ANIMASYONU - 3 AŞAMA ==========
 
-  // Dekoratif çerçeve
-  display.drawRFrame(5, 5, 118, 54, 4);
-  display.drawRFrame(7, 7, 114, 50, 3);
+  // AŞAMA 1: Animasyonlu Logo (Büyüyerek Giriş)
+  for (int scale = 0; scale <= 10; scale++) {
+    display.clearBuffer();
 
-  // Başlık - büyük font
-  display.setFont(u8g2_font_ncenB10_tr);
-  int textWidth = display.getStrWidth("TA2CAY");
-  display.drawStr((128 - textWidth) / 2, 25, "TA2CAY");
+    // Dış çerçeve - ölçeklendirerek büyüt
+    int frameSize = 40 + (scale * 4);
+    int frameX = 64 - (frameSize / 2);
+    int frameY = 32 - (frameSize / 2);
+    display.drawRFrame(frameX, frameY, frameSize, frameSize, 3);
 
-  // Alt başlık - orta font
-  display.setFont(u8g2_font_ncenB08_tr);
-  textWidth = display.getStrWidth("RADAR PROJESI");
-  display.drawStr((128 - textWidth) / 2, 42, "RADAR PROJESI");
+    // Başlık - fade in efekti (piksel atlayarak)
+    if (scale > 3) {
+      display.setFont(u8g2_font_ncenB10_tr);
+      int textWidth = display.getStrWidth("TA2CAY");
+      display.drawStr((128 - textWidth) / 2, 28, "TA2CAY");
+    }
+
+    // Alt başlık - daha sonra görünsün
+    if (scale > 6) {
+      display.setFont(u8g2_font_6x10_tr);
+      int subWidth = display.getStrWidth("RADAR");
+      display.drawStr((128 - subWidth) / 2, 42, "RADAR");
+    }
+
+    display.sendBuffer();
+    delay(60);
+  }
+  delay(300);
 
   // Alt bilgi - küçük font
   display.setFont(u8g2_font_4x6_tr);
-  textWidth = display.getStrWidth("v1.0");
-  display.drawStr((128 - textWidth) / 2, 52, "v1.0");
+  int textWidth = display.getStrWidth("v2.0");
+  display.drawStr((128 - textWidth) / 2, 52, "v2.0");
 
   display.sendBuffer();
   delay(2500);
+
+  // AŞAMA 2: İlerleme Çubuğu (Radar Yükleniyor)
+  display.clearBuffer();
+  display.setFont(u8g2_font_ncenB08_tr);
+  int msgWidth = display.getStrWidth("RADAR YUKLENIYOR...");
+  display.drawStr((128 - msgWidth) / 2, 20, "RADAR YUKLENIYOR...");
+
+  // İlerleme çubuğu çerçevesi
+  display.drawRFrame(14, 28, 100, 12, 2);
+  display.sendBuffer();
+  delay(200);
+
+  // İlerleme animasyonu
+  for (int progress = 0; progress <= 96; progress += 4) {
+    display.setDrawColor(1);
+    display.drawBox(16, 30, progress, 8);
+    display.sendBuffer();
+    delay(40);
+  }
+  delay(300);
+
+  // AŞAMA 3: Sonar Dalgası (Tarama Başlıyor)
+  display.clearBuffer();
+  display.setFont(u8g2_font_6x10_tr);
+  int radarWidth = display.getStrWidth("TARAMA BASLIYOR!");
+  display.drawStr((128 - radarWidth) / 2, 12, "TARAMA BASLIYOR!");
+
+  // Merkez nokta
+  int centerX = 64;
+  int centerY = 42;
+
+  // Genişleyen dalgalar
+  for (int wave = 0; wave <= 30; wave += 3) {
+    display.clearBuffer();
+
+    // Başlık
+    display.setFont(u8g2_font_6x10_tr);
+    display.drawStr((128 - radarWidth) / 2, 12, "TARAMA BASLIYOR!");
+
+    // Merkez noktası
+    display.drawDisc(centerX, centerY, 2);
+
+    // 3 dalga çemberi (büyüyerek kayboluyor)
+    if (wave >= 3)
+      display.drawCircle(centerX, centerY, wave);
+    if (wave >= 6)
+      display.drawCircle(centerX, centerY, wave - 6);
+    if (wave >= 9)
+      display.drawCircle(centerX, centerY, wave - 12);
+
+    display.sendBuffer();
+    delay(50);
+  }
+
+  // Son mesaj
+  display.clearBuffer();
+  display.setFont(u8g2_font_ncenB08_tr);
+  int readyWidth = display.getStrWidth("BASLIYORUZ!");
+  display.drawStr((128 - readyWidth) / 2, 35, "BASLIYORUZ!");
+  display.sendBuffer();
+  delay(800);
+
+  // ========== AÇILIŞ ANIMASYONU BİTTİ ==========
 
   // Servo başlat - güç için ÇOK yavaş başlat
   servo.attach(SERVO_PIN);
@@ -249,7 +326,14 @@ void drawStaticRadar() {
 void updateRadarDisplay(int angle, long distance) {
   display.clearBuffer();
 
-  // Statik radar gridini çiz
+  // *** MANUEL TERS MOD *** - Tüm ekranı beyaz yap (RADAR başlığı tekniği!)
+  display.setDrawColor(1);
+  display.drawBox(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); // Tüm ekran beyaz
+
+  // Şimdi her şeyi SIYAH çizeceğiz
+  display.setDrawColor(0);
+
+  // Statik radar gridini çiz (siyah)
   drawStaticRadar();
 
   // Fade effect - tarama izi
@@ -295,46 +379,70 @@ void updateRadarDisplay(int angle, long distance) {
 
   // --- SOL SÜTUN ---
 
-  // 1. Açı
-  sprintf(buffer, "Aci:%d%c", angle, 176);
-  display.drawStr(0, 8, buffer);
+  // 1. Açı (İKONLU!) - Pusula/açı ikonu
+  display.setFont(u8g2_font_open_iconic_embedded_1x_t);
+  display.drawGlyph(0, 8, 75); // 75 = dial/açı ikonu
 
-  // 2. Sıcaklık (Nem kaldırıldı)
+  // Açı değerini daha büyük fontla yaz
+  display.setFont(u8g2_font_7x13B_tr); // Daha büyük, kalın font
+  sprintf(buffer, "%d%c", angle, 176);
+  display.drawStr(10, 8, buffer);
+
+  // 2. Sıcaklık (İKONLU!) - Termometre ikonu
   if (temperature > 0) {
-    sprintf(buffer, "Sic:%dC", (int)temperature);
-    display.drawStr(0, 18, buffer);
+    // Termometre ikonu çiz (Open Iconic Thing set - 1x boyut)
+    display.setFont(u8g2_font_open_iconic_thing_1x_t);
+    display.drawGlyph(0, 18, 64); // 64 = termometre ikonu kodu
+
+    // Sıcaklık değerini ikonun yanına yaz
+    display.setFont(u8g2_font_5x7_tr);
+    sprintf(buffer, "%dC", (int)temperature);
+    display.drawStr(10, 18, buffer); // İkonun yanına yazdır
   }
 
   // --- SAĞ SÜTUN ---
 
-  // 1. Mesafe
-  sprintf(buffer, "Mes:%ld", distance < 999 ? distance : 0);
+  // 1. Mesafe (İKONLU!) - Cetvel ikonu
+  display.setFont(u8g2_font_open_iconic_thing_1x_t);
+  display.drawGlyph(120, 8, 71); // 71 = ruler/cetvel ikonu
+
+  // Mesafe değerini yaz (Daha dengeli font - kullanıcı isteği 8x8 tarzı)
+  display.setFont(u8g2_font_7x13B_tr); // Açı ile aynı font, daha dengeli
+  sprintf(buffer, "%ld", distance < 999 ? distance : 0);
   int w = display.getStrWidth(buffer);
-  display.drawStr(128 - w, 8, buffer);
+  display.drawStr(115 - w, 8, buffer); // Icon ile aynı hizada
 
-  // 2. Tespit (Min kaldırıldı)
-  sprintf(buffer, "Tesp:%d", totalDetections);
+  // 2. Tespit (İKONLU!) - Hedef ikonu
+  display.setFont(u8g2_font_open_iconic_thing_1x_t);
+  display.drawGlyph(120, 18, 68); // 68 = target/hedef ikonu
+
+  display.setFont(u8g2_font_5x7_tr);
+  sprintf(buffer, "%d", totalDetections);
   w = display.getStrWidth(buffer);
-  display.drawStr(128 - w, 18, buffer);
+  display.drawStr(118 - w, 18, buffer);
 
-  // 3. Tarama
-  sprintf(buffer, "Tar:%lu", scanCount / 36);
+  // 3. Tarama (İKONLU!) - Radar/reload ikonu
+  display.setFont(u8g2_font_open_iconic_arrow_1x_t);
+  display.drawGlyph(120, 28, 79); // 79 = reload/circular arrow ikonu
+
+  display.setFont(u8g2_font_5x7_tr);
+  sprintf(buffer, "%lu", scanCount / 36);
   w = display.getStrWidth(buffer);
-  display.drawStr(128 - w, 28, buffer);
+  display.drawStr(118 - w, 28, buffer);
 
-  // BAŞLIK - Ortada "RADAR" (Büyük ve Ters Renk)
-  // Beyaz kutu çiz
+  // BAŞLIK - Ortada "RADAR" (Siyah çerçeve + beyaz yazı - beyaz zemin için)
+  // Siyah kutu çiz (beyaz zemin üstünde)
+  display.setDrawColor(0);
+  display.drawRBox(35, 0, 58, 14, 2); // Siyah yuvarlak köşe kutu
+
+  // Beyaz yazı yaz (siyah kutunun içinde)
   display.setDrawColor(1);
-  display.drawBox(40, 0, 48, 12);
-
-  // Siyah yazı yaz
-  display.setDrawColor(0); // Siyah renk
-  display.setFont(u8g2_font_ncenB08_tr);
+  display.setFont(u8g2_font_ncenB10_tr); // Daha BÜYÜK font!
   int titleWidth = display.getStrWidth("RADAR");
-  display.drawStr((128 - titleWidth) / 2, 10, "RADAR");
+  display.drawStr((128 - titleWidth) / 2, 11, "RADAR"); // Y pozisyonu ayarlandı
 
-  // Rengi normale döndür
-  display.setDrawColor(1);
+  // Rengi siyaha döndür (geri kalan çizimler için)
+  display.setDrawColor(0);
 
   // TEHLİKE SEMBOLLERİ - Animasyonlu (Ortada, radarın içinde)
   if (closestDistance < 30 && blinkState) {
